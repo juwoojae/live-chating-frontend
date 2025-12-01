@@ -33,12 +33,16 @@
 </template>
 
 <script>
+import SockJS from 'sockjs-client';
+import Stomp from 'webstomp-client';
+//import axios from "axios";
+
 export default {
   data() {
     return {
-      ws: null,
       messages: [],
-      newMessage: ""
+      newMessage: "",
+      stompClient: null
     }
   },
   created() { //화면이 열리자 마자 웹소켓 연결 엔드포인트 호출
@@ -50,24 +54,23 @@ export default {
   },
   methods: {
     connectWebsocket() {
-      this.ws = new WebSocket("ws://localhost:8080/connect"); //Websocket 연결 시도
-      //1. 연결이 성공한 경우
-      this.ws.onopen = () => {
-        console.log("successfully connected!! ");
-      }
-      //2. 메세지가 들어오면
-      this.ws.onmessage = (message) => {
-        this.messages.push(message.data);  //메세지 배열에 메세지 push
-        this.scrollToBottom();
-      }
-      //3. 연결이 끊기는 경우
-      this.ws.onclose = () => {
-        console.log("disconnected!! ");
-      }
+      // sockjs 는 http 엔드포인트를 사용한다, websocket 을 내장한 향상된 js 라이브러리
+      const sockJs = new SockJS(`${process.env.VUE_APP_API_BASE_URL}/connect`)
+      this.stompClient = Stomp.over(sockJs); //SockJS 객체를 이용해서 stomp 객체로 만들어야 한다
+      //연결 요청
+      this.stompClient.connect({},
+          () => {
+            this.stompClient.subscribe(`/topic/1`, (message) => {
+              console.log(message);
+              this.messages.push(message.body);
+              this.scrollToBottom();
+            })
+          }
+      );
     },
     sendMessage() {
       if (this.newMessage.trim() === "") return;
-      this.ws.send(this.newMessage);
+      this.stompClient.send(`/publish/1`, this.newMessage);  //메세지를 1 번 room 에 발송한다
       this.newMessage = "";
     },
     // 메세지가 띄워짐과 동시에 스크롤이 내려감
@@ -80,11 +83,11 @@ export default {
       });
     },
     disconnectWebsocket() {
-      if (this.ws) {
-        this.ws.close(); // 서버단의 웹소켓 핸들러에서 afterConnectionClosed 를 실행한다.
-        console.log("disconnected!! ");
-        this.ws = null;
-      }
+      // if (this.ws) {
+      //   this.ws.close(); // 서버단의 웹소켓 핸들러에서 afterConnectionClosed 를 실행한다.
+      //   console.log("disconnected!! ");
+      //   this.ws = null;
+      // }
     }
   }
 }
