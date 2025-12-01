@@ -55,6 +55,7 @@ export default {
         password: this.password,
       }
       //axios 는 시간이 좀 걸려서 비동기로 주로 씀
+      alert(`${process.env.VUE_APP_API_BASE_URL}/member/create 로 이동`)
       await axios.post(`${process.env.VUE_APP_API_BASE_URL}/member/create`,data);
       this.$router.push({ path: "/" });
     }
