@@ -42,7 +42,8 @@ export default {
     return {
       messages: [],
       newMessage: "",
-      stompClient: null
+      stompClient: null,
+      token: ""
     }
   },
   created() { //화면이 열리자 마자 웹소켓 연결 엔드포인트 호출
@@ -57,8 +58,11 @@ export default {
       // sockjs 는 http 엔드포인트를 사용한다, websocket 을 내장한 향상된 js 라이브러리
       const sockJs = new SockJS(`${process.env.VUE_APP_API_BASE_URL}/connect`)
       this.stompClient = Stomp.over(sockJs); //SockJS 객체를 이용해서 stomp 객체로 만들어야 한다
+      this.token = localStorage.getItem('token');
       //연결 요청
-      this.stompClient.connect({},
+      this.stompClient.connect({
+            Authorization: `Bearer ${this.token}`
+          },
           () => {
             this.stompClient.subscribe(`/topic/1`, (message) => {
               console.log(message);
@@ -100,3 +104,4 @@ export default {
   margin: 10px;
 }
 </style>
+
