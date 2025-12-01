@@ -31,6 +31,7 @@
 
 <script>
 import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
 export default {
   data(){
@@ -45,7 +46,12 @@ export default {
       const response = await axios.post(`${process.env.VUE_APP_API_BASE_URL}/member/doLogin`,data);
       console.log(response); //response.data 에 토큰이 들어있음을 확인
       const token = response.data.token;
+      const role = jwtDecode(token).role;
+      const email = jwtDecode(token).sub;
+
       localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+      localStorage.setItem("email", email);
       window.location.href="/"; //성공하면 루트로 이동
     }
   }
