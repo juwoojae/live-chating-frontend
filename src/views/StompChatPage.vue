@@ -45,11 +45,13 @@ export default {
       newMessage: "",
       stompClient: null,
       token: "",
-      senderEmail: null
+      senderEmail: null,
+      roomId: null
     }
   },
   created() { //화면이 열리자 마자 웹소켓 연결 엔드포인트 호출
     this.senderEmail = localStorage.getItem("email");
+    this.roomId = this.$route.params.roomId
     this.connectWebsocket();
   },
   // 사용자가 현재 라우트에서 다른 라우트로 이동하려고 할때 호출되는 훅함수
@@ -73,7 +75,7 @@ export default {
             Authorization: `Bearer ${this.token}`
           }, //1 room 을 구독함, 메세지가 서버에서 1 room 으로 들어오면 콜백이 자동 실행된다
           () => {
-            this.stompClient.subscribe(`/topic/1`, (message) => {
+            this.stompClient.subscribe(`/topic/${this.roomId}`, (message) => {
               console.log("요거는 {} ", message);
               const paresMessage = JSON.parse(message.body);
               this.messages.push(paresMessage);
@@ -89,7 +91,7 @@ export default {
         senderEmail: this.senderEmail,
         message: this.newMessage
       }
-      this.stompClient.send(`/publish/1`, JSON.stringify(message));  //axios 가 아니므로 json 형태로 변환 해야한다.
+      this.stompClient.send(`/publish/${this.roomId}`, JSON.stringify(message));  //axios 가 아니므로 json 형태로 변환 해야한다.
       this.newMessage = "";
     },
     // 메세지가 띄워짐과 동시에 스크롤이 내려감
@@ -103,7 +105,7 @@ export default {
     },
     disconnectWebsocket() {
       if(this.stompClient && this.stompClient.connected){
-        this.stompClient.unsubscribe(`/topic/1`);
+        this.stompClient.unsubscribe(`/topic/${this.roomId}`);
         this.stompClient.disconnect();
       }
     }
