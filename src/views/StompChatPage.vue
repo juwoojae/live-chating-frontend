@@ -106,9 +106,12 @@ export default {
         }
       });
     },
-    disconnectWebsocket() {
+    async disconnectWebsocket() {
+
+      await axios.post(`${process.env.VUE_APP_API_BASE_URL}/chat/room/${this.roomId}/read`);  // 읽기 처리
+
       if(this.stompClient && this.stompClient.connected){
-        this.stompClient.unsubscribe(`/topic/${this.roomId}`);
+        this.stompClient.unsubscribe(`/topic/${this.roomId}`);   //여기서 인터셉터에서 자꾸 걸리는거네
         this.stompClient.disconnect();
       }
     }

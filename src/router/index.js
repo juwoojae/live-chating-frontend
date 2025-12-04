@@ -5,6 +5,8 @@ import MemberList from "@/views/MemberList.vue"
 import SimpleWebsocket from "@/views/SimpleWebsocket.vue"
 import StompChatPage from "@/views/StompChatPage.vue"
 import GroupChattingList from "@/views/GroupChattingList.vue"
+import MyChatPage from "@/views/MyChatPage.vue"
+
 //router 는 ssr 로 따지면 controller 임 view 를 띄워주는 역할을 한다 /home 엔드 포인트 -> homePage 라는  view
 //view 는 Vue Component 에 대응된다
 const routes = [
@@ -37,6 +39,11 @@ const routes = [
         path: '/groupchatting/list',
         name: 'GroupChattingList',
         component: GroupChattingList
+    },
+    {
+        path: '/my/chat/page',
+        name: 'MyChatPage',
+        component: MyChatPage
     }
 ]
 
