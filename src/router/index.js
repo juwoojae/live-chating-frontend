@@ -44,7 +44,7 @@ const routes = [
         path: '/my/chat/page',
         name: 'MyChatPage',
         component: MyChatPage
-    }
+    },
 ]
 
 const router = createRouter({
